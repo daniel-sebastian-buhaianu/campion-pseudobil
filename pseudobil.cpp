@@ -16,35 +16,44 @@ int main()
 	if (cerinta == 1)
 	{
 		citeste.close();
-		int x = lungimeDiagonala - 1;
+		int x = lungimeDiagonala-1;
 		int rezultat = (x*x + 1)/2;
 		scrie << rezultat;
 		scrie.close();
 	}
 	else
 	{
-		int existaBila[nrLinii + 1][nrLinii + 1];
-		memset(existaBila,
+		int sumaBile[nrLinii+1][nrLinii+1];
+		memset(sumaBile,
 		       0,
-		       sizeof(existaBila));
-		int i;
-		for (i = 0; i < nrBile; i++)
+		       sizeof(sumaBile));
+		int i, j, linie, coloana;
+		citeste >> linie >> coloana;
+		for (i = coloana; i <= nrLinii; i++)
 		{
-			int linie, coloana;
+			sumaBile[linie][i] = 1;
+		}
+		for (i = 1; i < nrBile; i++)
+		{
 			citeste >> linie >> coloana;
-			existaBila[linie][coloana] = 1;
+			sumaBile[linie][coloana]
+				= sumaBile[linie][coloana-1]
+				  + 1;
+			for (j = coloana+1; j <= nrLinii; j++)
+			{
+				sumaBile[linie][j] += 1;
+			}
 		}
 		int nrIntrebari;
 		citeste >> nrIntrebari;
 		for (i = 0; i < nrIntrebari; i++)
 		{
-			int linie, coloana;
 			citeste >> linie >> coloana;
 			int primaLinie = linie;
 			int ultimaLinie = primaLinie
 				          + lungimeDiagonala;
-			int primaColoana[lungimeDiagonala + 1],
-			    ultimaColoana[lungimeDiagonala + 1];
+			int primaColoana[lungimeDiagonala+1],
+			    ultimaColoana[lungimeDiagonala+1];
 			memset(primaColoana,
 			       -1,
 			       sizeof(primaColoana));
@@ -53,8 +62,8 @@ int main()
 			       sizeof(ultimaColoana));
 			primaColoana[primaLinie] = coloana;
 			ultimaColoana[primaLinie] = coloana;
-			int j = primaLinie + 1,
-			    liniaDeMijloc = (primaLinie
+			j = primaLinie+1;
+			int liniaDeMijloc = (primaLinie
 			                    + ultimaLinie)/2;
 			while (j <= liniaDeMijloc)
 			{
@@ -75,14 +84,9 @@ int main()
 			int nrBileInCadru = 0;
 			for (j = primaLinie; j <= ultimaLinie; j++)
 			{
-				for (int k = primaColoana[j];
-				     k <= ultimaColoana[j]; k++)
-				{
-					if (existaBila[j][k])
-					{
-						nrBileInCadru++;
-					}
-				}
+				nrBileInCadru
+					+= sumaBile[j][ultimaColoana[j]]
+					   - sumaBile[j][primaColoana[j]-1];
 			}
 			scrie << nrBileInCadru << endl;
 		}
