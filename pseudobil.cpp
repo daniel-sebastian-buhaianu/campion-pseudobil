@@ -27,8 +27,9 @@ int main()
 		memset(sumaBile,
 		       0,
 		       sizeof(sumaBile));
-		int i, j, linie, coloana;
+		int linie, coloana;
 		citeste >> linie >> coloana;
+		int i, j;
 		for (i = coloana; i <= nrLinii; i++)
 		{
 			sumaBile[linie][i] = 1;
@@ -49,44 +50,29 @@ int main()
 		for (i = 0; i < nrIntrebari; i++)
 		{
 			citeste >> linie >> coloana;
-			int primaLinie = linie;
-			int ultimaLinie = primaLinie
-				          + lungimeDiagonala;
-			int primaColoana[lungimeDiagonala+1],
-			    ultimaColoana[lungimeDiagonala+1];
-			memset(primaColoana,
-			       -1,
-			       sizeof(primaColoana));
-			memset(ultimaColoana,
-			       -1,
-			       sizeof(ultimaColoana));
-			primaColoana[primaLinie] = coloana;
-			ultimaColoana[primaLinie] = coloana;
-			j = primaLinie+1;
-			int liniaDeMijloc = (primaLinie
-			                    + ultimaLinie)/2;
-			while (j <= liniaDeMijloc)
-			{
-				primaColoana[j] = primaColoana[j-1]
-				                  - 1;
-				ultimaColoana[j] = ultimaColoana[j-1]
-						   + 1;
-				j++;
-			}
-			while (j <= ultimaLinie)
-			{
-				primaColoana[j] = primaColoana[j-1]
-				                  + 1;
-				ultimaColoana[j] = ultimaColoana[j-1]
-				                   - 1;
-				j++;
-			}
-			int nrBileInCadru = 0;
+			int primaLinie = linie,
+			    ultimaLinie = primaLinie
+			                  + lungimeDiagonala,
+			    liniaDeMijloc = (primaLinie
+			                     + ultimaLinie)/2,
+			    primaColoana = coloana,
+			    ultimaColoana = coloana,
+			    nrBileInCadru = 0;
 			for (j = primaLinie; j <= ultimaLinie; j++)
 			{
-				nrBileInCadru
-					+= sumaBile[j][ultimaColoana[j]]
-					   - sumaBile[j][primaColoana[j]-1];
+				nrBileInCadru +=
+					sumaBile[j][ultimaColoana]
+					- sumaBile[j][primaColoana-1];
+				if (j < liniaDeMijloc)
+				{
+					primaColoana -= 1;
+					ultimaColoana += 1;
+				}
+				else
+				{
+					primaColoana += 1;
+					ultimaColoana -= 1;
+				}
 			}
 			scrie << nrBileInCadru << endl;
 		}
