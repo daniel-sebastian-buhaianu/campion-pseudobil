@@ -1,16 +1,19 @@
 #include <fstream>
-#include <cstring>
+#define MAX_N 1502
+#define MAX_DIM 2*MAX_N-1
 using namespace std;
+bool existaBila[MAX_DIM][MAX_DIM];
+int sumaPartiala[MAX_DIM][MAX_DIM];
 int main()
 {
 	ifstream citeste("pseudobil.in");
 	ofstream scrie("pseudobil.out");
 	int cerinta,
-	    nrLinii,
+	    valoareN,
 	    nrBile,
 	    lungimeDiagonala;
 	citeste >> cerinta
-	        >> nrLinii
+	        >> valoareN
 		>> nrBile
 		>> lungimeDiagonala;
 	if (cerinta == 1)
@@ -23,26 +26,26 @@ int main()
 	}
 	else
 	{
-		int sumaBile[nrLinii+1][nrLinii+1];
-		memset(sumaBile,
-		       0,
-		       sizeof(sumaBile));
-		int linie, coloana;
-		citeste >> linie >> coloana;
-		int i, j;
-		for (i = coloana; i <= nrLinii; i++)
+		int nrLinii = 2*valoareN - 1;
+		int i, linie, coloana, lin, col;
+		for (i = 0; i < nrBile; i++)
 		{
-			sumaBile[linie][i] = 1;
+			citeste >> linie >> coloana;	
+			// lin = linia in matricea rotita
+			lin = linie + coloana - 1;
+			// col = coloana in matricea rotita
+			col = valoareN - linie + coloana;
+			existaBila[lin][col] = 1;
 		}
-		for (i = 1; i < nrBile; i++)
+		for (i = 1; i <= nrLinii; i++)
 		{
-			citeste >> linie >> coloana;
-			sumaBile[linie][coloana]
-				= sumaBile[linie][coloana-1]
-				  + 1;
-			for (j = coloana+1; j <= nrLinii; j++)
+			for (int j = 1; j <= nrLinii; j++)
 			{
-				sumaBile[linie][j] += 1;
+				sumaPartiala[i][j]
+					= sumaPartiala[i-1][j]
+					  + sumaPartiala[i][j-1]
+					  - sumaPartiala[i-1][j-1]
+					  + existaBila[i][j];
 			}
 		}
 		int nrIntrebari;
@@ -50,35 +53,26 @@ int main()
 		for (i = 0; i < nrIntrebari; i++)
 		{
 			citeste >> linie >> coloana;
-			int primaLinie = linie,
-			    ultimaLinie = primaLinie
-			                  + lungimeDiagonala,
-			    liniaDeMijloc = (primaLinie
-			                     + ultimaLinie)/2,
-			    primaColoana = coloana,
-			    ultimaColoana = coloana,
-			    nrBileInCadru = 0;
-			for (j = primaLinie; j <= ultimaLinie; j++)
-			{
-				nrBileInCadru +=
-					sumaBile[j][ultimaColoana]
-					- sumaBile[j][primaColoana-1];
-				if (j < liniaDeMijloc)
-				{
-					primaColoana -= 1;
-					ultimaColoana += 1;
-				}
-				else
-				{
-					primaColoana += 1;
-					ultimaColoana -= 1;
-				}
-			}
-			scrie << nrBileInCadru << endl;
+			// calculez liniile si coloanele
+			// in matricea rotita a patratului
+			// (romb rotit = patrat)
+			int linieSus = linie + coloana - 1,
+			    linieJos = linieSus
+			               + lungimeDiagonala,
+			    coloanaDreapta = valoareN
+					     - linie
+					     + coloana,
+			    coloanaStanga = coloanaDreapta
+			                    - lungimeDiagonala;
+		        int nrBileDinPatrat
+		        = sumaPartiala[linieJos][coloanaDreapta]
+		        - sumaPartiala[linieSus-1][coloanaDreapta]
+		        - sumaPartiala[linieJos][coloanaStanga-1]
+		        + sumaPartiala[linieSus-1][coloanaStanga-1];
+			scrie << nrBileDinPatrat << endl;
 		}
 		citeste.close();
 		scrie.close();
 	}
 	return 0;
 }
-
